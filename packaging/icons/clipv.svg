@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ClipV 应用图标：深色底板 + 白色剪贴板 + 蓝色 V（矢量源，1024 网格） -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>ClipV</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#313855"/>
+      <stop offset="1" stop-color="#1B1F2D"/>
+    </linearGradient>
+    <linearGradient id="vfill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5CB3FF"/>
+      <stop offset="1" stop-color="#2E86F0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角方形底板（与应用图标网格留白一致） -->
+  <rect x="64" y="64" width="896" height="896" rx="208" fill="url(#bg)"/>
+
+  <!-- 剪贴板主体 -->
+  <rect x="292" y="296" width="440" height="500" rx="72" fill="#F8FAFD"/>
+
+  <!-- 顶部夹子（含深色内芯，凸显夹子结构） -->
+  <rect x="418" y="240" width="188" height="112" rx="52" fill="#F8FAFD"/>
+  <rect x="470" y="278" width="84" height="36" rx="18" fill="#232838"/>
+
+  <!-- 字母 V（粗壮圆头笔画，小尺寸下依然清晰） -->
+  <path d="M 408 442 L 512 652 L 616 442" fill="none" stroke="url(#vfill)"
+        stroke-width="84" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

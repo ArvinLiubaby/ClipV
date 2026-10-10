@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clipv"
+version = "2.1.0"
+description = "Linux 剪贴板历史管理工具（类似 Windows Win+V，GTK3 原生）"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "arvin" }]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Environment :: X11 Applications :: GTK",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+]
+# GTK3/PyGObject 作为系统包使用（Debian/Ubuntu 预装：python3-gi、
+# gir1.2-gtk-3.0、python3-gi-cairo），不声明为 pip 依赖，避免源码编译；
+# 仅 X11 热键/粘贴所需的 python-xlib 走 pip。
+dependencies = [
+    "python-xlib>=0.33; sys_platform == 'linux'",
+]
+
+[project.scripts]
+clipv = "clipv.cli:main"
+
+[tool.setuptools]
+packages = ["clipv"]
