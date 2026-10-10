@@ -50,7 +50,7 @@ sudo apt install ./clipv_2.1.0_all.deb    # 在 deb 所在目录执行；文件�
 ### 方式二：源码运行（开发）
 
 ```bash
-git clone <本仓库地址>
+git clone https://github.com/ArvinLiubaby/ClipV.git
 cd ClipV
 ./install.sh          # 检查系统 GTK 依赖，生成 ~/.local/bin/clipv 入口
 ```
