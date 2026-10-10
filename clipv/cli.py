@@ -543,6 +543,27 @@ def cmd_shortcut(args) -> int:
     return 1
 
 
+# ---------------------------------------------------------------- about
+
+def cmd_about(_args) -> int:
+    """打开关于对话框（与托盘菜单「关于 ClipV」同一入口）。"""
+    try:
+        resp = ipc.call({"cmd": "about-dialog"}, timeout=5)
+    except ipc.IpcNotRunning:
+        if not _start_daemon_background():
+            _err("守护进程启动失败，请运行 `clipv daemon` 查看错误")
+            return 1
+        try:
+            resp = ipc.call({"cmd": "about-dialog"}, timeout=5)
+        except ipc.IpcNotRunning:
+            _err("守护进程未运行")
+            return 1
+    if resp.get("ok"):
+        print("已打开「关于」对话框")
+        return 0
+    return _fail(resp)
+
+
 # ---------------------------------------------------------------- doctor
 
 def _doctor_hotkey(daemon_ok: bool) -> None:
@@ -731,6 +752,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_short = sub.add_parser("shortcut", help="全局快捷键绑定管理")
     p_short.add_argument("action", choices=["install", "remove", "edit"])
 
+    sub.add_parser("about", help="打开关于对话框")
+
     sub.add_parser("doctor", help="环境与能力诊断")
 
     sub.add_parser("version", help="显示版本")
@@ -753,6 +776,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         "config": cmd_config,
         "autostart": cmd_autostart,
         "shortcut": cmd_shortcut,
+        "about": cmd_about,
         "doctor": cmd_doctor,
         "version": cmd_version,
         "_ingest": cmd_ingest,

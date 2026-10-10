@@ -1,4 +1,4 @@
-"""系统托盘图标：常驻状态区，提供“显示面板 / 设置快捷键 / 退出 ClipV”入口。
+"""系统托盘图标：常驻状态区，提供“显示面板 / 设置快捷键 / 关于 / 退出 ClipV”入口。
 
 后端优先级：
 - AyatanaAppIndicator3（SNI 状态通知区，Cinnamon/KDE/Ubuntu 原生支持）；
@@ -50,19 +50,22 @@ def _load_ayatana():
 
 
 class TrayIcon:
-    """托盘图标 + 右键菜单（显示面板 / 设置快捷键 / 退出 ClipV）。
+    """托盘图标 + 右键菜单（显示面板 / 设置快捷键 / 关于 / 退出 ClipV）。
 
     on_show：左键激活或菜单“显示面板”时调用；
     on_settings：菜单“设置快捷键…”时调用（可选，None 时隐藏该项）；
+    on_about：菜单“关于 ClipV”时调用（可选，None 时隐藏该项）；
     on_quit：菜单“退出 ClipV”时调用（由守护进程优雅退出）。
     """
 
     def __init__(self, on_show: Callable[[], None],
                  on_quit: Callable[[], None],
-                 on_settings: Optional[Callable[[], None]] = None) -> None:
+                 on_settings: Optional[Callable[[], None]] = None,
+                 on_about: Optional[Callable[[], None]] = None) -> None:
         self._on_show = on_show
         self._on_quit = on_quit
         self._on_settings = on_settings
+        self._on_about = on_about
         self._icon_name = _ICON_NAME
         self._indicator = None
         self._status_icon: Optional[Gtk.StatusIcon] = None
@@ -99,6 +102,10 @@ class TrayIcon:
             item_settings = Gtk.MenuItem(label="设置快捷键…")
             item_settings.connect("activate", lambda *_: self._on_settings())
             menu.append(item_settings)
+        if self._on_about is not None:
+            item_about = Gtk.MenuItem(label="关于 ClipV")
+            item_about.connect("activate", lambda *_: self._on_about())
+            menu.append(item_about)
         item_quit = Gtk.MenuItem(label="退出 ClipV")
         item_quit.connect("activate", lambda *_: self._on_quit())
         menu.append(Gtk.SeparatorMenuItem())
@@ -173,11 +180,12 @@ class TrayIcon:
 
 def create_tray(on_show: Callable[[], None],
                 on_quit: Callable[[], None],
-                on_settings: Optional[Callable[[], None]] = None
+                on_settings: Optional[Callable[[], None]] = None,
+                on_about: Optional[Callable[[], None]] = None
                 ) -> Optional[TrayIcon]:
     """创建托盘图标；任何失败返回 None（调用方应继续正常工作）。"""
     try:
-        tray = TrayIcon(on_show, on_quit, on_settings).build()
+        tray = TrayIcon(on_show, on_quit, on_settings, on_about).build()
         return tray if tray.available else None
     except Exception as exc:
         log.debug("托盘图标不可用：%s", exc)

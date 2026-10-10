@@ -31,7 +31,7 @@ deb 安装包约 48 KB（GTK3 系统原生依赖，无 venv、无 Qt 运行时�
 - **固定与清理**：固定条目置顶；清空需同键二次确认；条数上限与单条大小可配
 - **隐私安全**：数据仅存本地 SQLite（无任何网络代码）；默认忽略常见密码管理器；日志不记录剪贴板内容
 - **轻量**：GTK3 / PyGObject 走发行版系统包；deb 约 48 KB（对比自包含 Qt 方案约 600 MB）
-- **托盘常驻**：AppIndicator 图标，左键呼出面板、右键菜单
+- **托盘常驻**：AppIndicator 图标；左键呼出面板，右键菜单可设置快捷键、查看「关于」与退出
 
 ## 安装
 
@@ -89,6 +89,7 @@ clipv                     # 手动呼出面板
 | `clipv clear [--all]` | 清空非固定历史；`--all` 含固定条目（二次确认） |
 | `clipv config show/set/get/reset` | 查看或修改配置 |
 | `clipv shortcut install/remove/edit` | 绑定/解绑/图形化设置全局快捷键 |
+| `clipv about` | 打开关于对话框（版本 / 仓库地址 / 许可） |
 | `clipv autostart enable/disable` | 登录自启动（XDG autostart） |
 | `clipv daemon [--detached]` / `clipv stop` | 启动/停止守护进程 |
 | `clipv doctor` | 环境与能力诊断 |

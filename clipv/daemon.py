@@ -61,6 +61,7 @@ class Daemon:
                                         self._ipc_handler_thread)
         self.tray: Optional[tray_mod.TrayIcon] = None
         self._hotkey_dialog: Optional[Gtk.Dialog] = None
+        self._about_dialog: Optional[Gtk.Dialog] = None
 
     # ------------------------------------------------------------ 初始化
     def _init_x11(self) -> None:
@@ -91,7 +92,8 @@ class Daemon:
         self.monitor.start()
         self.tray = tray_mod.create_tray(
             on_show=self.show_panel, on_quit=self._schedule_quit,
-            on_settings=self.show_hotkey_dialog)
+            on_settings=self.show_hotkey_dialog,
+            on_about=self.show_about_dialog)
         self._config_source = GLib.timeout_add_seconds(2, self._on_config_tick)
         self._gc_images_tick()  # 启动时立即清理孤儿图片
         self._gc_source = GLib.timeout_add_seconds(
@@ -168,6 +170,28 @@ class Daemon:
         except Exception:
             self._hotkey_dialog = None
             log.exception("打开快捷键设置对话框失败")
+            return False
+
+    def show_about_dialog(self) -> bool:
+        """打开关于对话框（托盘菜单「关于 ClipV」/ `clipv about` 入口）。
+
+        对话框已打开时置顶聚焦；返回是否已成功显示。
+        """
+        if self._about_dialog is not None:
+            self._about_dialog.present()
+            return True
+        try:
+            from .about_dialog import AboutDialog
+            dialog = AboutDialog()
+            dialog.connect("destroy",
+                           lambda *_: setattr(self, "_about_dialog", None))
+            self._about_dialog = dialog
+            dialog.show_all()
+            dialog.present()
+            return True
+        except Exception:
+            self._about_dialog = None
+            log.exception("打开关于对话框失败")
             return False
 
     def _apply_hotkey_setting(self, hotkey: str) -> Tuple[bool, str]:
@@ -351,6 +375,9 @@ class Daemon:
         if cmd == "hotkey-dialog":
             return ({"ok": True} if self.show_hotkey_dialog()
                     else {"ok": False, "error": "打开快捷键设置对话框失败"})
+        if cmd == "about-dialog":
+            return ({"ok": True} if self.show_about_dialog()
+                    else {"ok": False, "error": "打开关于对话框失败"})
         if cmd == "status":
             total, pinned = self.store.stats()
             return {"ok": True, "data": {

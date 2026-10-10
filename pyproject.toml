@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clipv"
-version = "2.1.0"
+version = "2.1.1"
 description = "Linux 剪贴板历史管理工具（类似 Windows Win+V，GTK3 原生）"
 readme = "README.md"
 requires-python = ">=3.9"

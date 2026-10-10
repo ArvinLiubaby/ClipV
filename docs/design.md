@@ -118,7 +118,7 @@ ClipV 在后台运行，自动记录系统剪贴板内容。用户通过全局�
 | F-62 | 支持 Wayland 环境，受协议限制时降级 | 中 | 降级矩阵见 §4.3；`clipv doctor` 明确告知当前能力 |
 | F-63 | 支持通过桌面环境快捷键绑定 `clipv toggle` | 中→**高** | Wayland 下这是唯一可靠的热键路径；Cinnamon/GNOME 可自动安装 |
 | F-64 | 自动粘贴不可用时，仅写回剪贴板并提示手动粘贴 | 中 | 修订：仅当**开启了**自动粘贴但不可用时才发系统通知提醒；纯剪贴板模式不打扰 |
-| F-65 | 系统托盘常驻 **[2.1 新增]** | 中 | AppIndicator 图标：左键呼出面板；右键菜单「显示面板 / 设置快捷键… / 退出 ClipV」 |
+| F-65 | 系统托盘常驻 **[2.1 新增]** | 中 | AppIndicator 图标：左键呼出面板；右键菜单「显示面板 / 设置快捷键… / 关于 ClipV / 退出 ClipV」（关于对话框为 2.1.1 增补） |
 
 ### 2.9 安全与隐私功能
 
@@ -212,6 +212,7 @@ ClipV/
 │   ├── clipboard.py        # 剪贴板监听（文本+图片；Gtk.Clipboard owner-change / Wayland 双策略）
 │   ├── panel.py            # 历史面板 UI（GTK3 + Cairo + CSS）
 │   ├── hotkey_dialog.py    # 快捷键设置对话框（按键录制）
+│   ├── about_dialog.py     # 关于对话框（版本 / 仓库地址 / 许可）
 │   ├── tray.py             # 系统托盘图标（AppIndicator/StatusIcon）
 │   └── daemon.py           # 守护进程主逻辑（GLib 主循环）
 └── tests/                  # unittest（核心用纯 stdlib；GTK 冒烟用例需图形会话，否则跳过）
@@ -305,3 +306,4 @@ packaging/build_deb.sh      # 产物：dist/clipv_<版本>_all.deb（含解包�
 | 5 | 系统托盘集成（F-65） | AppIndicator 常驻图标：左键呼出面板，右键菜单「显示面板 / 设置快捷键… / 退出 ClipV」；打包引入品牌图标 `packaging/icons/clipv.svg` |
 | 6 | 快捷键图形化配置 | 托盘右键按键录制对话框（`hotkey_dialog.py`）；`clipv shortcut edit` 同入口；保存后自动更新 Cinnamon 绑定并立即重新注册，无需注销 |
 | 7 | 以 MIT 许可证开源 | 新增 README.md、LICENSE 与 docs/ 设计文档；仓库发布于 GitHub |
+| 8 | 关于对话框（2.1.1） | 托盘右键菜单新增「关于 ClipV」：图标、版本、简介、GitHub 仓库链接与 MIT 许可；链接由浏览器打开；`clipv about` 同入口，重复打开时聚焦已有窗口 |

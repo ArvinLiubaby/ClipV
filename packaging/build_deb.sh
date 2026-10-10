@@ -116,6 +116,8 @@ chmod 644 "$ROOT/usr/share/doc/$PKG_NAME/LICENSE"
 {
     echo "$PKG_NAME ($VERSION) unstable; urgency=low"
     echo
+    echo "  * 2.1.1：托盘菜单新增「关于 ClipV」（版本 / GitHub 仓库地址 /"
+    echo "    MIT 许可，链接可在浏览器打开）；clipv about 同入口。"
     echo "  * 2.1.0：新增图片剪贴板支持（大缩略图预览）；系统托盘图标"
     echo "    （右键可设置快捷键、退出）；Enter 确认后自动粘贴（类似 Win+V）；"
     echo "    面板可视面积放大 1.5 倍、底部提示字号加大；修复呼出后键盘"

@@ -32,30 +32,44 @@ class TrayIconTest(unittest.TestCase):
         shown = []
         quit_calls = []
         settings_calls = []
+        about_calls = []
         tray = tray_mod.TrayIcon(on_show=lambda: shown.append(1),
                                  on_quit=lambda: quit_calls.append(1),
-                                 on_settings=lambda: settings_calls.append(1))
+                                 on_settings=lambda: settings_calls.append(1),
+                                 on_about=lambda: about_calls.append(1))
         menu = tray._build_menu()
         items = [w for w in menu.get_children()
                  if isinstance(w, Gtk.MenuItem)
                  and not isinstance(w, Gtk.SeparatorMenuItem)]
         self.assertEqual([i.get_label() for i in items],
-                         ["显示面板", "设置快捷键…", "退出 ClipV"])
+                         ["显示面板", "设置快捷键…", "关于 ClipV", "退出 ClipV"])
         items[0].activate()
         self.assertEqual(len(shown), 1)
         items[1].activate()
         self.assertEqual(len(settings_calls), 1)
         items[2].activate()
+        self.assertEqual(len(about_calls), 1)
+        items[3].activate()
         self.assertEqual(len(quit_calls), 1)
 
     def test_menu_without_settings(self):
-        # 未传 on_settings 时不出现“设置快捷键…”项
+        # 未传 on_settings / on_about 时不出现对应项
         tray = tray_mod.TrayIcon(on_show=lambda: None, on_quit=lambda: None)
         menu = tray._build_menu()   # 保持引用，避免临时菜单被回收后子项失效
         items = [w.get_label() for w in menu.get_children()
                  if isinstance(w, Gtk.MenuItem)
                  and not isinstance(w, Gtk.SeparatorMenuItem)]
         self.assertEqual(items, ["显示面板", "退出 ClipV"])
+
+    def test_menu_without_about(self):
+        # 仅传 on_settings 时菜单不含“关于 ClipV”
+        tray = tray_mod.TrayIcon(on_show=lambda: None, on_quit=lambda: None,
+                                 on_settings=lambda: None)
+        menu = tray._build_menu()
+        items = [w.get_label() for w in menu.get_children()
+                 if isinstance(w, Gtk.MenuItem)
+                 and not isinstance(w, Gtk.SeparatorMenuItem)]
+        self.assertEqual(items, ["显示面板", "设置快捷键…", "退出 ClipV"])
 
     def test_build_and_destroy(self):
         tray = tray_mod.TrayIcon(on_show=lambda: None, on_quit=lambda: None)
