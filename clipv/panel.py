@@ -24,6 +24,7 @@ gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gdk, GdkPixbuf, GLib, Gtk, Pango  # noqa: E402
 
 from . import config as cfg_mod
+from . import preview as preview_mod
 from .images import load_pixbuf, png_size
 from .store import Entry, Store, search_text
 from .util import preview_line, relative_time
@@ -139,6 +140,7 @@ class ClipvPanel(Gtk.Window):
         self._entries: List[Entry] = []
         self._provider: Optional[Gtk.CssProvider] = None
         self._thumb_cache: dict = {}
+        self._preview = preview_mod.ImagePreview()
 
         self.set_title("ClipV")
         self.get_style_context().add_class("clipv-window")
@@ -196,6 +198,9 @@ class ClipvPanel(Gtk.Window):
         self.listbox.connect("button-press-event", self._on_list_button)
         self.listbox.connect("row-activated", self._on_row_activated)
         self.scroll.add(self.listbox)
+        # 滚动时隐藏悬停预览（缩略图位置变化，避免预览滞留）
+        self.scroll.get_vadjustment().connect("value-changed",
+                                              self._on_list_scroll)
         self.stack.add_named(self.scroll, "list")
 
         self.empty_label = Gtk.Label(label="")
@@ -253,6 +258,7 @@ class ClipvPanel(Gtk.Window):
             border-bottom-width: 1px;
             border-bottom-color: {p.divider};
         }}
+        .clipv-thumb {{ background: transparent; }}
         label.clipv-preview {{ color: {p.text}; }}
         label.clipv-meta {{ color: {p.muted}; font-size: 11px; }}
         label.clipv-hint {{ color: {p.muted}; font-size: 18px; }}
@@ -352,6 +358,7 @@ class ClipvPanel(Gtk.Window):
                 if key not in valid:
                     del self._thumb_cache[key]
         pinned_count = sum(1 for e in filtered if e.pinned)
+        self._preview.hide()    # 重建行会销毁缩略图，预览同步隐藏
         for row in self.listbox.get_children():
             self.listbox.remove(row)
         target_row: Optional[Gtk.ListBoxRow] = None
@@ -426,8 +433,19 @@ class ClipvPanel(Gtk.Window):
             if thumb is not None:
                 img = Gtk.Image.new_from_pixbuf(thumb)
                 img.set_valign(Gtk.Align.CENTER)
-                hbox.pack_start(img, False, False, 0)
-                hbox.reorder_child(img, 0)
+                # EventBox 提供事件窗口：悬停时弹出稍大的预览（preview.py）
+                thumb_box = Gtk.EventBox()
+                thumb_box.get_style_context().add_class("clipv-thumb")
+                thumb_box.add(img)
+                path = data.entry.content
+                thumb_box.connect(
+                    "enter-notify-event",
+                    lambda *_: self._preview.schedule(path))
+                thumb_box.connect(
+                    "leave-notify-event",
+                    lambda *_: self._preview.hide())
+                hbox.pack_start(thumb_box, False, False, 0)
+                hbox.reorder_child(thumb_box, 0)
 
         pin = Gtk.Button(label="★" if data.entry.pinned else "☆")
         pin.get_style_context().add_class("clipv-pin")
@@ -543,6 +561,7 @@ class ClipvPanel(Gtk.Window):
             log.debug("面板定位失败", exc_info=True)
 
     def hide_panel(self) -> None:
+        self._preview.hide()
         self.hide()
 
     # ------------------------------------------------------------ 键盘
@@ -610,6 +629,9 @@ class ClipvPanel(Gtk.Window):
         GLib.idle_add(do_scroll)
 
     # ------------------------------------------------------------ 鼠标
+    def _on_list_scroll(self, _adj) -> None:
+        self._preview.hide()
+
     def _on_row_activated(self, _listbox, row) -> None:
         data = getattr(row, "clipv_data", None)
         if data is not None:

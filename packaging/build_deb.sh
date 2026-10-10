@@ -116,6 +116,8 @@ chmod 644 "$ROOT/usr/share/doc/$PKG_NAME/LICENSE"
 {
     echo "$PKG_NAME ($VERSION) unstable; urgency=low"
     echo
+    echo "  * 2.1.2：图片缩略图悬停自动弹出放大预览（最大 480×360，"
+    echo "    等比缩放、不放大超过原图；延迟 250ms 弹出，移开即隐藏）。"
     echo "  * 2.1.1：托盘菜单新增「关于 ClipV」（版本 / GitHub 仓库地址 /"
     echo "    MIT 许可，链接可在浏览器打开）；clipv about 同入口。"
     echo "  * 2.1.0：新增图片剪贴板支持（大缩略图预览）；系统托盘图标"
